@@ -1,0 +1,298 @@
+<html>
+	<head>	
+	<style>
+	body{margin:0px;padding:0px;overflow:hidden;background:rgb(200,200,200);}
+		#micanvas{border:1px solid black;}
+	</style>
+	<script
+  src="https://code.jquery.com/jquery-3.2.1.js"
+  integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+  crossorigin="anonymous"></script>
+	</head>
+	<body>
+		<canvas id="micanvas" width=1920px height=1080px></canvas>
+		<script>
+			var micanvas = document.getElementById("micanvas");
+			var contexto = micanvas.getContext("2d");
+			var contador = 0;
+			var puntos = 200;
+			var puntox = new Array();
+			var puntoy = new Array();
+			var direccion = new Array();
+			
+			var radio = new Array();
+			var r = new Array();
+			var g = new Array();
+			var b = new Array();
+			objetivox = 1920/2;
+			  objetivoy = 1080/2;
+			var velocidad = new Array();
+			// Pongo los puntos en las posiciones
+				for(var i = 0;i<=puntos;i++){
+					puntox[i] = Math.random()*1920;
+					puntoy[i] = Math.random()*1080;
+					radio[i] = Math.random()*5+25;
+					direccion[i] = Math.random()*Math.PI*2;
+					r[i] = Math.round(Math.random()*127)+127;
+					g[i] = Math.round(Math.random()*127)+127;
+					b[i] = Math.round(Math.random()*127)+127;
+					velocidad[i] = 1;
+				}
+			var jugadorx = 1920/2
+			var jugadory = 1080/2
+			var jugadordireccion = 0
+			var jugadordireccionactual = 0;
+			var jugadorvelocidad = 1;
+			var puntoactivado = new Array();
+			for(var i = 0;i<puntos;i++){
+				puntoactivado[i] = 1;
+			}
+			var distancia = new Array()
+			var candidatos = 3;
+			var indicecandidato = new Array()
+			//var indicecandidato1,indicecandidato2,indicecandidato3;
+			var j;
+			var temporizador;
+			var p1 = new Array()
+			var p2 = new Array()
+			var p3 = new Array();
+			var p4 = new Array();
+			var cuentalineas = 0;
+			inicio();
+			function inicio(){
+				dale();
+				bucle()
+			}
+			
+			function bucle(){
+				contador++;
+				
+				/*
+					puntos++;
+					puntox[puntos] = Math.random()*1920;
+					puntoy[puntos] = Math.random()*1080;
+					radio[i] = Math.random()*5+25;
+					direccion[puntos] = Math.random()*Math.PI*2;
+					r[puntos] = Math.round(Math.random()*255);
+					g[puntos] = Math.round(Math.random()*255);
+					b[puntos] = Math.round(Math.random()*255);
+					console.log("El nuevo puntox insertado es: "+puntox[puntos]);
+				*/
+				
+				//console.log(i)
+				dale();
+				clearTimeout(temporizador)
+				temporizador = setTimeout("bucle()",0);
+				//console.log(puntox)
+			}
+			function dale(){
+				cuentalineas = 0;
+				contexto.clearRect(0,0,1920,1080);
+				/*
+				for(var i = 0;i<=puntos;i++){
+					direccion[i] += (Math.random() - 0.5)/4
+					puntox[i] += Math.cos(direccion[i]);
+					puntoy[i] += Math.sin(direccion[i]);
+					velocidad[i] += (Math.random()-0.5)*0.01
+					if(puntox[i] > 1920 || puntox[i] < 0 || puntoy[i] > 1080 || puntox[i] < 0 )
+					direccion[i] += 0.1
+				}
+				*/
+				// Dibujo lineas con los tres vertices mas cercanos
+				contexto.strokeStyle = "rgba(220,220,220)";
+				for(var i = 0;i<=puntos;i++){
+					
+					// Averiguar los 3 minimos antes de volver al for anterior
+					for(var u = 0;u<=candidatos;u++){
+						var temporal = 100000;
+						for(var j = 0;j<puntos;j++){
+							if(Math.sqrt(Math.pow((puntox[j]-puntox[i]),2)+Math.pow((puntoy[j]-puntoy[i]),2)) < temporal && j != i && indicecandidato.includes( j ) == false){
+								indicecandidato[u] = j;
+								temporal = Math.sqrt(Math.pow((puntox[j]-puntox[i]),2)+Math.pow((puntoy[j]-puntoy[i]),2))
+							} 
+						}
+						tempdireccion = 0;
+						//console.log(temporal)
+						if( Math.sqrt(Math.pow((puntox[i]-puntox[indicecandidato[u]]),2)+Math.pow((puntoy[i]-puntoy[indicecandidato[u]]),2)) <300 ){
+								puntox[i] += Math.cos(direccion[i])*velocidad[i] + Math.cos(Math.atan2((puntox[i]-puntox[indicecandidato[u]]), puntoy[i]-puntoy[indicecandidato[u]]));
+								puntoy[i] += Math.sin(direccion[i])*velocidad[i]+ Math.sin(Math.atan2((puntox[i]-puntox[indicecandidato[u]]), puntoy[i]-puntoy[indicecandidato[u]]))
+								
+								puntox[indicecandidato[u]] += Math.cos(direccion[i])*velocidad[i] + Math.cos(tempdireccion += Math.atan2((puntox[indicecandidato[u]]-puntox[i]), puntoy[indicecandidato[u]]-puntoy[i]));
+								puntoy[indicecandidato[u]] += Math.cos(direccion[i])*velocidad[i] + Math.sin(tempdireccion += Math.atan2((puntox[indicecandidato[u]]-puntox[i]), puntoy[indicecandidato[u]]-puntoy[i]));
+								cadena = "rgb("+(200-(t*2))+","+(200-(t*10))+","+(200-(t*10))+")";
+							}		
+							if( Math.sqrt(Math.pow((puntox[i]-puntox[indicecandidato[u]]),2)+Math.pow((puntoy[i]-puntoy[indicecandidato[u]]),2))  >300 ){
+								puntox[i] += Math.cos(direccion[i])*velocidad[i] + Math.cos(tempdireccion += Math.atan2((puntox[indicecandidato[u]]-puntox[i]), puntoy[indicecandidato[u]]-puntoy[i]));
+								puntoy[i] += Math.cos(direccion[i])*velocidad[i] + Math.sin(tempdireccion += Math.atan2((puntox[indicecandidato[u]]-puntox[i]), puntoy[indicecandidato[u]]-puntoy[i]));
+								
+								puntox[indicecandidato[u]] += Math.cos(direccion[i])*velocidad[i] + Math.cos(Math.atan2((puntox[i]-puntox[indicecandidato[u]]), puntoy[i]-puntoy[indicecandidato[u]]));
+								puntoy[indicecandidato[u]] += Math.sin(direccion[i])*velocidad[i]+ Math.sin(Math.atan2((puntox[i]-puntox[indicecandidato[u]]), puntoy[i]-puntoy[indicecandidato[u]]))
+								cadena = "rgb("+(200-(t*10))+","+(200-(t*2))+","+(200-(t*10))+")";				
+							}
+							
+							for(var t = 2;t<=radio[i];t++){
+								contexto.strokeStyle = cadena
+								contexto.beginPath();
+								contexto.lineWidth = t;
+								contexto.moveTo(puntox[i],puntoy[i])
+								contexto.lineTo(puntox[i] + (puntox[indicecandidato[u]]-puntox[i])/t*2,puntoy[i]+ (puntoy[indicecandidato[u]]-puntoy[i])/t*2)
+								contexto.stroke();
+							}
+							
+					}
+					//console.log(candidatos)
+					// Para cada uno de los candidatos encontrados
+					contexto.beginPath();
+							contexto.strokeStyle = "rgb(0,0,0)";
+								contexto.lineWidth = 1;
+								contexto.moveTo(puntox[i],puntoy[i])
+								contexto.lineTo(puntox[i] + Math.cos(direccion[i])*50,puntoy[i]+ Math.sin(direccion[i])*50)
+								contexto.stroke();
+					
+					//direccion[i] = tempdireccion;
+					
+				}
+				
+				
+				// Dibujo los puntos
+				for(var i = 0;i<=puntos;i++){
+				//console.log("hay "+puntos+" particulas")
+					// color de fondo
+					contexto.beginPath();
+					contexto.fillStyle = "rgb("+r[i]+","+g[i]+","+b[i]+")";
+					contexto.arc(puntox[i],puntoy[i],radio[i],0,2*Math.PI)
+					contexto.fill();
+					if(!isNaN(puntox[i]) && !isNaN(puntoy[i]) && !isNaN(radio[i])){
+					//	sombra negra
+					//console.log(puntox[i])
+					var sombra=contexto.createLinearGradient(puntox[i],puntoy[i],puntox[i],puntoy[i]+radio[i]);
+					sombra.addColorStop(0,"rgba(0,0,0,0.0)");
+					sombra.addColorStop(1,"rgba(0,0,0,0.5)");
+					contexto.beginPath();
+					contexto.fillStyle = sombra;
+					contexto.arc(puntox[i],puntoy[i],radio[i]*0.8,0,2*Math.PI)
+					contexto.fill();
+					//	reflejo
+					var sombra=contexto.createLinearGradient(puntox[i],puntoy[i]-radio[i],puntox[i],puntoy[i]);
+					sombra.addColorStop(0,"rgba(255,255,255,0.5)");
+					sombra.addColorStop(1,"rgba(255,255,255,0.0)");
+					contexto.beginPath();
+					contexto.fillStyle = sombra;
+					contexto.arc(puntox[i],puntoy[i],radio[i]*0.8,0,2*Math.PI)
+					contexto.fill();
+					}
+					// Linea exterior
+					contexto.beginPath();
+					contexto.strokeStyle = "rgb(0,127,0)";
+					contexto.lineWidth = 6;
+					contexto.arc(puntox[i],puntoy[i],radio[i],0,2*Math.PI)
+					contexto.stroke();
+				}
+				// colision!
+				/*
+				var datos2 = contexto.getImageData(jugadorx,jugadory,1,1);
+				var desglose1 = datos2.data;	
+suma = 0;				
+					for(var i = 0;i<desglose1.length;i+=4){
+						suma += Math.abs(desglose1[i]);
+						
+					}
+					//console.log(suma);
+				
+				*/
+					
+				
+				
+			}
+			$( document ).keydown(function( event ) {
+			  if ( event.which == 37 ) {
+			   event.preventDefault();
+			   for(i = 0;i<=puntos;i++){
+					puntox[i] -= 10;
+			   }
+			  }
+			  if ( event.which == 38 ) {
+			   event.preventDefault();
+			   for(i = 0;i<=puntos;i++){
+					puntoy[i] -= 10;
+			   }
+			  }
+			  if ( event.which == 39 ) {
+			   event.preventDefault();
+			   for(i = 0;i<=puntos;i++){
+					puntox[i] += 10;
+			   }
+			  }
+			  if ( event.which == 40 ) {
+			   event.preventDefault();
+			   for(i = 0;i<=puntos;i++){
+					puntoy[i] += 10;
+			   }
+			  }
+			  if ( event.which == 107 ) {
+			   event.preventDefault();
+			   for(i = 0;i<=puntos;i++){
+					puntox[i] *= 1.1;
+					puntoy[i] *= 1.1;
+					radio[i] *= 1.1
+			   }
+			  }
+			  if ( event.which == 109 ) {
+			   event.preventDefault();
+			   for(i = 0;i<=puntos;i++){
+					puntox[i] *= 0.9;
+					puntoy[i] *= 0.9;
+					radio[i] *= 0.9;
+			   }
+			  }
+			  
+			});
+			$( document ).on( "click", function( event ) {
+			/*
+			  objetivox = event.pageX;
+			  objetivoy = event.pageY;
+			  jugadordireccionactual = Math.atan2(objetivoy - jugadory, objetivox - jugadorx);
+			  //console.log(objetivox, objetivoy)
+			  */
+			  
+			 puntos++
+					puntox[puntos] = event.pageX;
+					puntoy[puntos] = event.pageY;
+					radio[puntos] = Math.random()*5+25;
+					direccion[puntos] = Math.random()*Math.PI*2;
+					r[puntos] = Math.round(Math.random()*255);
+					g[puntos] = Math.round(Math.random()*255);
+					b[puntos] = Math.round(Math.random()*255);
+					//console.log(event.pageX)
+					
+			  
+			});
+			var contains = function(needle) {
+    // Per spec, the way to identify NaN is that it is not equal to itself
+    var findNaN = needle !== needle;
+    var indexOf;
+
+    if(!findNaN && typeof Array.prototype.indexOf === 'function') {
+        indexOf = Array.prototype.indexOf;
+    } else {
+        indexOf = function(needle) {
+            var i = -1, index = -1;
+
+            for(i = 0; i < this.length; i++) {
+                var item = this[i];
+
+                if((findNaN && item !== item) || item === needle) {
+                    index = i;
+                    break;
+                }
+            }
+
+            return index;
+        };
+    }
+
+    return indexOf.call(this, needle) > -1;
+};
+		</script>
+	</body>
+</html>
